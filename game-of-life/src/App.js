@@ -7,16 +7,43 @@ class App extends Component {
     super(props);
 
     this.state = {
-      board: this.props.seeds
+      board: this.props.seeds,
+      game: false,
+      timer: 0
     };
 
   }
 
-  componentDidMount() {
-    window.setInterval(() => {
-      this.setState((prevState, props) => ({ board: this.getNextStep(prevState.board) }));
+  startGame() {
+    this.setState({
+      game: true
+    });
+
+    this.interval = window.setInterval(() => {
+      this.setState((prevState) => ({
+          board: this.getNextStep(prevState.board),
+          timer: prevState.timer + 1
+      }));
     }, 1000);
   }
+
+  stopGame() {
+    window.clearInterval(this.interval);
+    this.setState({
+      game: false
+    });
+  }
+
+  resetGame() {
+    this.setState({
+      board: this.props.seeds,
+      timer: 0
+    });
+  }
+
+  // componentDidMount() {
+  //   this.startGame();
+  // }
 
   getNeighboursCount(rowIndex, cellIndex) {
     const { board } = this.state;
@@ -98,6 +125,15 @@ class App extends Component {
   }
 
   render() {
+    const { board, timer, game } = this.state;
+
+    let btn;
+    if (game) {
+      btn = <a onClick={ this.stopGame.bind(this) }>Stop</a>;
+    } else {
+      btn = <a onClick={ this.startGame.bind(this) }>Start</a>;
+    }
+
     return (
       <div className="App">
         <div className="header">
@@ -105,8 +141,15 @@ class App extends Component {
         </div>
         <Board
           {...this.props}
-          board={ this.state.board }
+          board={ board }
         />
+        <div className="controls">
+          { btn }
+          <a onClick={ this.resetGame.bind(this) }>Reset</a>
+        </div>
+        <div className="timer">
+          { timer }
+        </div>
       </div>
     );
   }

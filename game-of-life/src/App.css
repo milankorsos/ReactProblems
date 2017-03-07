@@ -34,3 +34,14 @@
   background-color: white;
   border: 0.5px solid gray;
 }
+
+a {
+  color: blue;
+  text-decoration: underline;
+  padding: 20px;
+  cursor: pointer;
+}
+
+.timer {
+  padding: 20px;
+}
