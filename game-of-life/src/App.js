@@ -41,12 +41,7 @@ class App extends Component {
     });
   }
 
-  // componentDidMount() {
-  //   this.startGame();
-  // }
-
-  getNeighboursCount(rowIndex, cellIndex) {
-    const { board } = this.state;
+  getNeighboursCount(board, rowIndex, cellIndex) {
     let count = 0;
 
     // Check N
@@ -102,7 +97,7 @@ class App extends Component {
     // Iterate through board and apply all the rules to the cells. Reflect new changes in nextState
     currentState.forEach((row, rowIndex) => {
       row.forEach((cell, cellIndex) => {
-        const neighboursCount = this.getNeighboursCount(rowIndex, cellIndex);
+        const neighboursCount = this.getNeighboursCount(currentState, rowIndex, cellIndex);
         // Alive
         if (cell === 1) {
           if (neighboursCount === 2 || neighboursCount === 3) {
