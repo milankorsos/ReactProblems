@@ -11,7 +11,10 @@ class Cell extends Component {
     const cellClass = board[rowIndex][cellIndex] === 1 ? 'cell live' : 'cell dead';
 
     return (
-      <span className={ cellClass }></span>
+      <span
+        className={ cellClass }
+        onClick={ this.props.clickHandler.bind(this, rowIndex, cellIndex) }
+      ></span>
     );
   }
 }

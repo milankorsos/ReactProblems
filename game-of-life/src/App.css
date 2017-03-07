@@ -23,6 +23,7 @@
 
 .cell {
   flex: 1;
+  cursor: pointer;
 }
 
 .live {

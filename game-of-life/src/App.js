@@ -119,6 +119,14 @@ class App extends Component {
     return nextState;
   }
 
+  clickHandler(rowIndex, cellIndex) {
+    this.setState((prevState) => {
+      const board = prevState.board;
+      board[rowIndex][cellIndex] = board[rowIndex][cellIndex] === 1 ? 0 : 1;
+      return ({ board });
+    });
+  }
+
   render() {
     const { board, timer, game } = this.state;
 
@@ -134,14 +142,18 @@ class App extends Component {
         <div className="header">
           <h2>Conway's Game of Life</h2>
         </div>
+
         <Board
           {...this.props}
           board={ board }
+          clickHandler={ this.clickHandler.bind(this) }
         />
+
         <div className="controls">
           { btn }
           <a onClick={ this.resetGame.bind(this) }>Reset</a>
         </div>
+
         <div className="timer">
           { timer }
         </div>
