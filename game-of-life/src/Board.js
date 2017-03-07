@@ -3,12 +3,12 @@ import Cell from './Cell';
 
 class Board extends Component {
   render() {
-    const { seeds } = this.props;
+    const { board } = this.props;
 
     return (
       <div className="game">
         {
-          seeds.map((row, rowIndex) => {
+          board.map((row, rowIndex) => {
             return (
               <div
                 className="row"

@@ -5,10 +5,10 @@ class Cell extends Component {
     const {
       cellIndex,
       rowIndex,
-      seeds
+      board
     } = this.props;
 
-    const cellClass = seeds[rowIndex][cellIndex] === 1 ? 'cell live' : 'cell dead';
+    const cellClass = board[rowIndex][cellIndex] === 1 ? 'cell live' : 'cell dead';
 
     return (
       <span className={ cellClass }></span>
