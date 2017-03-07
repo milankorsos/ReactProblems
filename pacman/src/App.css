@@ -1,0 +1,40 @@
+.App {
+  text-align: center;
+}
+
+.header {
+  background-color: #222;
+  height: 60px;
+  padding: 20px;
+  color: white;
+}
+
+.board {
+  margin: 100px;
+  display: inline-block;
+  border: 60px solid gray;
+}
+
+.row {
+  height: 60px;
+  width: 600px;
+  display: flex;
+}
+
+.cell {
+  flex: 1;
+  border: 10px solid white;
+}
+
+.wall {
+  background-color: gray;
+  border: 10px solid gray;
+}
+
+.pacman {
+  background-color: green;
+}
+
+.ghost {
+  background-color: yellow;
+}
