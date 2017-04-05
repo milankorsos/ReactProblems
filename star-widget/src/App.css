@@ -1,0 +1,55 @@
+.App {
+  text-align: center;
+}
+
+form {
+  margin: 200px auto 200px auto;
+  width: 600px;
+}
+
+form div {
+  margin: 40px;
+}
+
+
+label {
+  display: inline-block;
+  width: 150px;
+}
+
+input,
+button {
+  background-color: #fd5c63;
+  border-radius: 10px;
+  border: 1px white solid;
+  color: white;
+  font-size: 20px;
+  padding: 10px;
+  width: 300px;
+}
+
+button {
+  background-color: white;
+  color: #fd5c63;
+  cursor: pointer;
+  width: 300px;
+}
+
+ul {
+  display: inline-flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 300px;
+}
+
+li {
+  color: white;
+  cursor: pointer;
+  font-size: 35px;
+  opacity: .2;
+}
+
+li.selected {
+  opacity: 1;
+}
