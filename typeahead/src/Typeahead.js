@@ -86,25 +86,44 @@ class Typeahead extends Component {
 
   }
 
+  fetchResults(q) {
+    if (!q.length) {
+      return false;
+    }
+
+    console.log('fetch', q)
+    const url = `https://typeahead-js-twitter-api-proxy.herokuapp.com/demo/search?q=${q}`;
+
+    fetch(url)
+      .then((resp) => resp.json()) // Transform the data into json
+      .then((data) => {
+        console.log('data', data, 'q', q, 'this.state.q', this.state.q)
+        if (this.state.q === q) {
+          this.setState({
+            filteredResults: data
+          });
+        } else {
+          console.log('dropping result')
+        }
+      })
+      .catch((e) => {
+        console.log('error', e)
+      })
+
+  }
+
   onChange(event) {
     const q = event.target.value;
     const { results } = this.props;
-    let filteredResults;
-
-    if (q.length) {
-      filteredResults = results.filter(item => {
-        const screenName = item.screen_name.toLowerCase();
-        return screenName.indexOf(q.toLowerCase()) !== -1;
-      });
-    } else {
-      filteredResults = [];
-    }
 
     this.setState({
       q,
-      filteredResults,
+      filteredResults: [],
       selectedIndex: -1
     });
+
+    this.fetchResults(q);
+
   }
 
   handleKeyUp(event) {
