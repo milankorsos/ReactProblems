@@ -1,26 +1,41 @@
 .hand {
-  width: 800px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
   margin: auto;
-
+  width: 70%;
 }
 
-.card {
-  display: inline-block;
+.hand .card {
   background-color: white;
   border-radius: 10px;
   border: 1px solid black;
+  display: flex;
+  flex-flow: column nowrap;
   height: 160px;
   margin: 10px;
   padding: 10px;
   width: 100px;
-  font-size: 20px;
 }
 
-.red {
+.hand .card ~ .red {
   color: red;
 }
 
-.card > .value {
-  position: relative;
-  left: 60px;
+.hand .card .value {
+  font-size: 25px;
+  order: 0;
+}
+
+.hand .card .suit {
+  order: 1;
+}
+
+.button {
+  width: 200px;
+  margin: 50px auto 50px auto;
+}
+
+.button > button {
+  width: 100%;
 }

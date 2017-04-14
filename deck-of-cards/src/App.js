@@ -1,55 +1,39 @@
 import React, { Component } from 'react';
 import './App.css';
 
-
 class Card extends Component {
-
-  renderHearts() {
-    return (
-      <span>&hearts;</span>
-    )
-  }
-
-  renderSpades() {
-    return (
-      <span>&spades;</span>
-    )
-  }
-
-  renderDiamonds() {
-    return (
-      <span>&diams;</span>
-    )
-  }
-
-  renderClubs() {
-    return (
-      <span>&clubs;</span>
-    )
-  }
-
   render() {
     const { card: { suit, value } } = this.props;
 
     let suitIcon;
     let color = 'black';
+
     switch (suit) {
       case 'Spades':
-        suitIcon = this.renderSpades();
+        suitIcon = (
+          <span>&spades;</span>
+        );
         break;
+
       case 'Hearts':
-        suitIcon = this.renderHearts();
+        suitIcon = (
+          <span>&hearts;</span>
+        );
         color = 'red';
         break;
+
       case 'Diamonds':
-        suitIcon = this.renderDiamonds();
+        suitIcon = (
+          <span>&diams;</span>
+        );
         color = 'red';
         break;
+
       case 'Clubs':
-        suitIcon = this.renderClubs();
-        break;
       default:
-        break
+        suitIcon = (
+          <span>&clubs;</span>
+        );
     }
 
     return (
@@ -78,6 +62,33 @@ class Hand extends Component {
   }
 }
 
+class Button extends Component {
+  render() {
+    const { deck, dealHand, prepDeck } = this.props;
+    let button;
+
+    if (deck.length) {
+      button = (
+        <button onClick={ dealHand.bind(this) }>
+          Deal a new hand
+        </button>
+      );
+    } else {
+      button = (
+        <button onClick={ prepDeck.bind(this) }>
+          Restart
+        </button>
+      );
+    }
+
+    return (
+      <div className="button">
+        { button }
+      </div>
+    );
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -92,7 +103,7 @@ class App extends Component {
     this.prepDeck();
   }
 
-  // Clear the hand & generate the deck of cards
+  // Generate the deck of cards & clear hand
   prepDeck() {
     const { CARD_SUITS, CARD_VALUES } = this.props;
 
@@ -107,7 +118,6 @@ class App extends Component {
       });
     });
 
-    // Clear the hand & reset deck
     this.setState({
       deck,
       hand: []
@@ -118,8 +128,8 @@ class App extends Component {
     return Math.floor(Math.random() * (max - min)) + min;
   }
 
+  // Pick a card randomly from deck, remove it & return it
   getCardFromDeck() {
-    // Pick a card randomly from deck, remove it from deck & return it
     const { deck } = this.state;
     if (!deck.length) {
       return null;
@@ -135,31 +145,28 @@ class App extends Component {
     return card;
   }
 
+  // Get 5 random cards from deck & replace hand with new hand
   dealHand() {
     const { HAND_SIZE } = this.props;
     const { deck } = this.state;
-    // Get 5 random cards from deck & replace hand with new hand
 
     const hand = [];
     const handSize = Math.min(HAND_SIZE, deck.length);
     for (let i = 0; i < handSize; i++) {
-      const card = this.getCardFromDeck();
-      if (card) {
-        hand.push(card);
-      }
+      hand.push(this.getCardFromDeck());
     }
 
     this.setState({ hand });
   }
 
   render() {
-    const deckSize = this.state.deck.length;
     return (
       <div>
-        <button onClick={ this.dealHand.bind(this) }>
-          Deal a new hand
-        </button>
-        <div>Deck size: { deckSize }</div>
+        <Button
+          dealHand={ this.dealHand.bind(this) }
+          prepDeck={ this.prepDeck.bind(this) }
+          deck={ this.state.deck }
+        />
         <Hand hand={ this.state.hand } />
       </div>
     );
