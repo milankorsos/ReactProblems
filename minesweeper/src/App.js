@@ -1,188 +1,185 @@
 import React, { Component } from 'react';
 import './App.css';
 
-/*
-  TODO:
-  - better way to track if end of game
-  - CSS
-  - code cleanup
-  - restart
-  - generate new board bases on size, # of mines
-*/
+const GAME = {
+  STARTED: 0,
+  LOST: -1,
+  WON: 1
+}
 
-class Mine extends Component {
-  countNeighboringMines() {
-    const { board, rowIndex, cellIndex } = this.props;
+const MINE = "X";
 
-    const rowStart = rowIndex === 0 ? rowIndex : rowIndex - 1;
-    const rowEnd = rowIndex === board.length - 1 ? rowIndex : rowIndex + 1;
-    const cellStart = cellIndex === 0 ? cellIndex : cellIndex - 1;
-    const cellEnd = cellIndex === board[0].length - 1 ? cellIndex : cellIndex + 1;
-
-    let counts = 0;
-    for (let row = rowStart; row <= rowEnd; row++) {
-      for (let cell = cellStart; cell <= cellEnd; cell++) {
-        if (board[row][cell] === 1) {
-          counts++;
-        }
-      }
-    }
-
-    return counts;
-  }
-
-  clickHandler(rowIndex, cellIndex) {
-    return this.props.visitCell(rowIndex, cellIndex);
-  }
-
+class Cell extends Component {
   render() {
-    const { rowIndex, cellIndex, board, visited } = this.props;
-
-    const isMine = board[rowIndex][cellIndex] === 1;
-    const isVisited = visited[rowIndex][cellIndex] === 1;
-
-    let cell = " "; // empty
-    if (isVisited) {
-      cell = isMine ? "X" : this.countNeighboringMines();
-    }
+    const { rowIndex, cellIndex, board, visited, onClick } = this.props;
+    const isVisited = visited[rowIndex][cellIndex];
+    const cell = isVisited ? board[rowIndex][cellIndex] : '';
+    const className = !isVisited ? 'new' : '';
     return (
-      <span
-        className="mine"
-        onClick={ this.clickHandler.bind(this, rowIndex, cellIndex) }>
-        [{ cell }]
-      </span>
+      <td
+        className={ className }
+        onClick={ onClick.bind(this, rowIndex, cellIndex) }
+      >
+        { cell }
+      </td>
     );
   }
 }
 
 class Board extends Component {
-  renderRow(row, rowIndex) {
+  render() {
+    const { board } = this.props;
     return (
-      <div className="row" key={ rowIndex }>
-        {
-          row.map((cell, cellIndex) => {
-            return (
-              <Mine
-                key={ cellIndex }
-                rowIndex={ rowIndex }
-                cellIndex={ cellIndex }
-                {...this.props }
-              />
-            );
-          })
-        }
+      <div className="board">
+        <table>
+          <tbody>
+            {
+              board.map((row, rowIndex) => {
+                return (
+                  <tr key={ rowIndex }>
+                    {
+                      row.map((cell, cellIndex) => {
+                        return (
+                          <Cell
+                            key={ cellIndex }
+                            rowIndex={ rowIndex }
+                            cellIndex={ cellIndex }
+                            {...this.props}
+                          />
+                        )
+                      })
+                    }
+                  </tr>
+                )
+              })
+            }
+          </tbody>
+        </table>
       </div>
     );
   }
-
-  render() {
-    const { board } = this.props;
-    return(
-      <div className="board">
-        {
-          board.map((row, rowIndex) => {
-            return this.renderRow(row, rowIndex);
-          })
-        }
-      </div>
-    )
-  }
 }
 
-const GAME_STATE = {
-  IN_PROGRESS: 0,
-  LOST: -1,
-  WON: 1
+class Message extends Component {
+  render() {
+    const { game,  restart } = this.props;
+
+    const restartLink = (
+      <div>
+        <a href="#" onClick={ restart.bind(this) }>Restart</a>
+      </div>
+    );
+
+    let message;
+    if (game === GAME.LOST) {
+      message = "You lost!";
+    } else if (game === GAME.WON) {
+      message = "You won!";
+    }
+
+    let panel;
+    if (message) {
+      panel = (
+        <div>
+          <strong>{ message }</strong>
+          { restartLink }
+        </div>
+      );
+    }
+
+    return (
+      <div className="message">
+        { panel }
+      </div>
+    );
+  }
 }
 
 class App extends Component {
   constructor(props) {
     super(props);
-    const { board } = this.props;
 
-    // set up visited
-    const visited = [];
-    for (let i = 0; i < board.length; i++) {
-      visited.push(new Array(board[0].length).fill(0));
-    }
-
-    this.state = {
-      board,
-      visited,
-      gameState: GAME_STATE.IN_PROGRESS
-    }
+    this.state = this.getStartState();
   }
 
-  visitCell(rowIndex, cellIndex) {
-    const { board, visited, gameState } = this.state;
+  restart() {
+    this.setState(this.getStartState());
+  }
 
-    if (gameState === GAME_STATE.IN_PROGRESS) {
+  getStartState() {
+    return {
+      board: this.getNewBoard(),
+      game: GAME.STARTED,
+      visited: this.getNewVisited(),
+      visitedCount: 0
+    };
+  }
 
-      // Mark field as visited
+  getNewBoard() {
+    const board = [
+      [MINE, 2, 1],
+      [2, MINE, 2],
+      [1, 2, MINE],
+    ];
+    return board;
+  }
+
+  getNewVisited() {
+    const visited = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+    return visited;
+  }
+
+  cellClick(rowIndex, cellIndex) {
+    const { visited, board, game, visitedCount } = this.state;
+    const { SIZE } = this.props;
+
+    let newGame = game;
+    let newVisitedCount = visitedCount;
+
+    if (!visited[rowIndex][cellIndex] && game === GAME.STARTED) {
+      // Mark cell as visited
       visited[rowIndex][cellIndex] = 1;
-      this.setState({ visited });
+      newVisitedCount++;
 
       // Check if lost
-      if (board[rowIndex][cellIndex] === 1) {
-        this.setState({ gameState: GAME_STATE.LOST })
+      const lost = board[rowIndex][cellIndex] === MINE;
+      if (lost) {
+        newGame = GAME.LOST;
       }
 
-      // Check if won: if everyting is visited but the number of mines
-      let visitedCount = 0;
-      let mineCount = 0;
-      const boardSize = board.length * board[0].length;
-      for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[0].length; j++) {
-          visitedCount += visited[i][j];
-          mineCount += board[i][j];
-        }
+      // Check if won
+      const cellCount = SIZE * SIZE;
+      const minesCount = SIZE;
+      const won = newVisitedCount === cellCount - minesCount;
+      if (won) {
+        newGame = GAME.WON;
       }
 
-      if (boardSize - mineCount === visitedCount) {
-        this.setState({ gameState: GAME_STATE.WON })
-      }
+      // Save state
+      this.setState({
+        visited,
+        game: newGame,
+        visitedCount: newVisitedCount
+      });
     }
-  }
-
-  renderMessage() {
-    const { gameState } = this.state;
-
-    let panel;
-    switch (gameState) {
-      case GAME_STATE.WON:
-        panel = (
-          <strong>
-            You won!
-          </strong>
-        );
-        break;
-
-      case GAME_STATE.LOST:
-        panel = (
-          <strong>
-            You lost!
-          </strong>
-        );
-        break;
-
-      default:
-        panel = (
-          <strong></strong>
-        );
-    }
-
-    return panel;
   }
 
   render() {
     return (
-      <div className="App">
+      <div>
+        <Message
+          game={ this.state.game }
+          restart={ this.restart.bind(this) }
+        />
         <Board
           board={ this.state.board }
           visited={ this.state.visited }
-          visitCell={ this.visitCell.bind(this) }
+          onClick={ this.cellClick.bind(this) }
         />
-        { this.renderMessage() }
       </div>
     );
   }
