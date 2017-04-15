@@ -5,7 +5,7 @@ import './index.css';
 
 ReactDOM.render(
   <App
-    SIZE="3"
+    SIZE="5"
   />,
   document.getElementById('root')
 );
