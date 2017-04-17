@@ -12,12 +12,11 @@ import './App.css';
 */
 
 const GAME_STATE = {
-  STOPPED: 'STOPPED',
   PLAYER1: 'PLAYER1',
   PLAYER2: 'PLAYER2',
   PLAYER1_WON: 'PLAYER1_WON',
   PLAYER2_WON: 'PLAYER2_WON',
-  BOARD_FULL: 'BOARD_FULL'
+  DRAW: 'DRAW'
 };
 
 class Cell extends Component {
@@ -79,47 +78,35 @@ class Board extends Component {
 
 class Messages extends Component {
   render() {
-    const { gameState, updateGameState, restart } = this.props;
+    const { gameState, restart } = this.props;
 
     let message;
     let button;
     let restartBtn = (
-      <div>
-        <button type="button" onClick={ restart.bind(this) } >Restart</button>
-      </div>
+      <button type="button" onClick={ restart.bind(this) } >Restart</button>
     );
 
     switch (gameState) {
-      case GAME_STATE.STOPPED:
-        message = 'Select Player';
-        button = (
-          <div>
-            <button type="button" onClick={ updateGameState.bind(this, GAME_STATE.PLAYER1 ) } >Player 1</button>
-            <button type="button" onClick={ updateGameState.bind(this, GAME_STATE.PLAYER2 ) } >Player 2</button>
-          </div>
-        );
-        break;
-
       case GAME_STATE.PLAYER1:
-        message = 'Next: Player 1';
+        message = 'Next: X';
         break;
 
       case GAME_STATE.PLAYER2:
-        message = 'Next: Player 2';
+        message = 'Next: O';
         break;
 
       case GAME_STATE.PLAYER1_WON:
-        message = 'Player 1 won!';
+        message = 'X won!';
         button = restartBtn;
         break;
 
       case GAME_STATE.PLAYER2_WON:
-        message = 'Player 2 won!';
+        message = 'O won!';
         button = restartBtn;
         break;
 
-      case GAME_STATE.BOARD_FULL:
-        message = 'No one won!';
+      case GAME_STATE.DRAW:
+        message = 'Draw!';
         button = restartBtn;
         break;
 
@@ -130,7 +117,7 @@ class Messages extends Component {
     return(
       <div className="messages">
         <div>{ message }</div>
-        { button }
+        <div>{ button }</div>
       </div>
     );
   }
@@ -140,40 +127,36 @@ class App extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = this.getStartState();
+  }
+
+  restart() {
+    this.setState(this.getStartState());
   }
 
   getStartState() {
     return {
       board: this.getEmptyBoard(),
-      gameState: GAME_STATE.STOPPED
+      gameState: GAME_STATE.PLAYER1
     };
   }
 
   getEmptyBoard() {
     const board = [];
     for (let i = 0; i < 3; i++) {
-      const row = [];
-      for (let j = 0; j < 3; j++) {
-        row.push(0);
-      }
-      board.push(row);
+      board.push(new Array(3).fill(0));
     }
     return board;
   }
 
   checkIfPlayerWon(value, board) {
-
-    // Check horizontals
+    // Check rows & columns
     for (let i = 0; i < 3; i++) {
+      // Row
       if (board[i][0] === board[i][1] && board[i][0] === board[i][2] && board[i][0] === value) {
         return true;
       }
-    }
-
-    // Check vertical
-    for (let i = 0; i < 3; i++) {
+      // Col
       if (board[0][i] === board[1][i] && board[0][i] === board[2][i] && board[0][i] === value) {
         return true;
       }
@@ -205,19 +188,21 @@ class App extends Component {
 
   clickHandler(rowIndex, colIndex) {
     const { board, gameState } = this.state;
-    const cell = board[rowIndex][colIndex];
-    const gameInProgress = gameState === GAME_STATE.PLAYER1 || gameState === GAME_STATE.PLAYER2;
 
-    if (cell === 0 && gameInProgress) {
-      let nextGameState;
+    const isEmptyCell = board[rowIndex][colIndex] === 0;
+    const isGameInProgress = gameState === GAME_STATE.PLAYER1 || gameState === GAME_STATE.PLAYER2;
 
+    if (isEmptyCell && isGameInProgress) {
       const value = gameState === GAME_STATE.PLAYER1 ? -1 : 1;
-      const nextPlayer = gameState === GAME_STATE.PLAYER1 ? GAME_STATE.PLAYER2 : GAME_STATE.PLAYER1;
 
       // Update board
       board[rowIndex][colIndex] = value;
 
+      // Set next game state
+      let nextGameState;
+
       // Game ended if current player won or board is full
+      const nextPlayer = gameState === GAME_STATE.PLAYER1 ? GAME_STATE.PLAYER2 : GAME_STATE.PLAYER1;
       const currentPlayerWon = this.checkIfPlayerWon(value, board);
       const player1Won = currentPlayerWon && gameState === GAME_STATE.PLAYER1;
       const player2Won = currentPlayerWon && gameState === GAME_STATE.PLAYER2;
@@ -228,7 +213,7 @@ class App extends Component {
       } else if (player2Won) {
         nextGameState = GAME_STATE.PLAYER2_WON;
       } else if (isBoardFull) {
-        nextGameState = GAME_STATE.BOARD_FULL;
+        nextGameState = GAME_STATE.DRAW;
       } else {
         nextGameState = nextPlayer;
       }
@@ -240,20 +225,11 @@ class App extends Component {
     }
   }
 
-  updateGameState(gameState) {
-    this.setState({ gameState });
-  }
-
-  restart() {
-    this.setState(this.getStartState());
-  }
-
   render() {
     return (
       <div className="App">
         <Messages
           gameState={ this.state.gameState }
-          updateGameState={ this.updateGameState.bind(this) }
           restart={ this.restart.bind(this) }
         />
         <Board
