@@ -163,18 +163,18 @@ class App extends Component {
     return board;
   }
 
-  checkIfCurrentPlayerWon(rowIndex, colIndex, value, board) {
+  checkIfPlayerWon(value, board) {
 
     // Check horizontals
     for (let i = 0; i < 3; i++) {
-      if (board[i][0] === board[i][1] && board[i][0] === board[i][2] && board[i][2] === value) {
+      if (board[i][0] === board[i][1] && board[i][0] === board[i][2] && board[i][0] === value) {
         return true;
       }
     }
 
     // Check vertical
     for (let i = 0; i < 3; i++) {
-      if (board[0][i] === board[1][i] && board[0][i] === board[2][i] && board[2][i] === value) {
+      if (board[0][i] === board[1][i] && board[0][i] === board[2][i] && board[0][i] === value) {
         return true;
       }
     }
@@ -218,7 +218,7 @@ class App extends Component {
       board[rowIndex][colIndex] = value;
 
       // Game ended if current player won or board is full
-      const currentPlayerWon = this.checkIfCurrentPlayerWon(rowIndex, colIndex, value, board);
+      const currentPlayerWon = this.checkIfPlayerWon(value, board);
       const player1Won = currentPlayerWon && gameState === GAME_STATE.PLAYER1;
       const player2Won = currentPlayerWon && gameState === GAME_STATE.PLAYER2;
       const isBoardFull = this.checkIfBoardIsFull(board);
