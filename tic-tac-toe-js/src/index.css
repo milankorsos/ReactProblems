@@ -1,0 +1,37 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+* {
+  box-sizing: border-box;;
+}
+
+#root {
+  width: 300px;
+  margin: auto;
+}
+
+#root h1 {
+  text-align: center;
+}
+
+#root #board {
+  border: 1px solid gray;
+  text-align: center;
+}
+
+
+#board .row {
+ display: flex;
+}
+
+#board .cell {
+  width: 100px;
+  height: 100px;
+  border: 1px solid gray;
+  cursor: pointer;
+  font-size: 50px;
+  padding: 20px;
+}
