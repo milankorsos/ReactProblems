@@ -8,19 +8,19 @@ body {
   box-sizing: border-box;;
 }
 
-#tic-tac-toe {
+#root {
   margin: 100px;
 }
 
-#board {
+.board {
   clear: left;
 }
 
-#board .row {
+.board .row {
   float: left;
 }
 
-#board .cell {
+.board .cell {
   border: 1px solid gray;
   cursor: pointer;
   display: block;

@@ -31,31 +31,31 @@ function TicTacToe(boardSize, id) {
     board.push(new Array(boardSize).fill(0));
   }
 
-  this.state = STATE.GAME;
-  this.player = PLAYER.X;
-  this.board = board;
-  this.id = id;
+  this.state = {
+    game: STATE.GAME,
+    player: PLAYER.X,
+    board: board
+  }
 
-  this.render(this.id, this.board);
-  const _board = document.getElementById(id);
-  _board.addEventListener('click', this.onClickHandler.bind(this), true);
+  const _root = document.getElementById('root');
+  this._root = _root;
+
+  this.render(this._root, this.state);
+  this._root.addEventListener('click', this.onClickHandler.bind(this), true);
 }
 
 TicTacToe.prototype.onClickHandler = function(e) {
   const _el = e.srcElement;
   const x = _el.getAttribute('data-x');
   const y = _el.getAttribute('data-y');
-  this.play(x, y)
-  this.render(this.id, this.board);
+  this.play(x, y, this.state)
+  this.render(this._root, this.state);
 }
 
-TicTacToe.prototype.render = function(id, board) {
-  const _board = document.getElementById(id);
-  while (_board.firstChild) {
-    _board.removeChild(_board.firstChild);
-  }
+TicTacToe.prototype.renderBoard = function(board) {
+  const _board = document.createElement('div');
+  _board.className = 'board';
 
-  // Render board
   for (let i = 0; i < board.length; i++) {
     const _row = document.createElement('div');
     _row.className = 'row';
@@ -75,48 +75,68 @@ TicTacToe.prototype.render = function(id, board) {
 
       const _cellText = document.createTextNode(text);
       _cell.appendChild(_cellText);
+
       _row.appendChild(_cell);
     }
     _board.appendChild(_row);
   }
+  return _board;
+}
 
-  // Render messages
-  const _messages = document.createElement('div');
-  _messages.className = 'messages';
+TicTacToe.prototype.renderStatus = function(game, player) {
+  const _status = document.createElement('div');
+  _status.className = 'status';
 
   let text = '';
-  if (this.state === STATE.DRAW) {
-    text = 'Game Over! Its a draw!';
-  } else if (this.state === STATE.WIN && this.player === PLAYER.X) {
-    text = 'Game Over! X won!';
-  } else if (this.state === STATE.WIN && this.player === PLAYER.Y) {
-    text = 'Game Over! O won!';
+  const currentPlayer = player === PLAYER.X ? 'X' : 'O';
+  switch (game) {
+    case STATE.GAME:
+      text = `Next: ${currentPlayer}`;
+      break;
+    case STATE.DRAW:
+      text = 'Game over! Draw!';
+      break;
+    case STATE.WIN:
+      text = `Game over! ${currentPlayer} won!`;
+      break;
+    default:
   }
   const _text = document.createTextNode(text);
 
-  console.log('text', text);
-  _messages.appendChild(_text);
-  _board.appendChild(_messages);
-
+  _status.appendChild(_text);
+  return _status;
 }
 
-TicTacToe.prototype.play = function(x, y) {
-  if (this.board[x][y] === 0 && this.state === STATE.GAME) {
+TicTacToe.prototype.render = function(_root, state) {
+  // Clear _root (Warning: this is not very efficient, use shadow dom!)
+  while (_root.firstChild) {
+    _root.removeChild(_root.firstChild);
+  }
+  // Append status & board
+  _root.appendChild(this.renderStatus(state.game, state.player));
+
+  console.log(this.renderStatus(state.game, state.player))
+  _root.appendChild(this.renderBoard(state.board));
+}
+
+TicTacToe.prototype.play = function(x, y, state) {
+  const { board, game, player } = state;
+
+  if (board[x][y] === 0 && game === STATE.GAME) {
     // Update board
-    this.board[x][y] = this.player;
+    board[x][y] = player;
 
     // Check if game over
-    const hasPlayerWon = this.hasPlayerWon(this.board, this.player);
-    const isBoardFull = this.isBoardFull(this.board);
+    const hasPlayerWon = this.hasPlayerWon(board, player, x, y);
+    const isBoardFull = this.isBoardFull(board);
     if (hasPlayerWon) {
-      this.state = STATE.WIN;
-      console.log('Game Over!', this.state, 'Winner:', this.player)
+      state.game = STATE.WIN;
     } else if (isBoardFull) {
-      this.state = STATE.DRAW;
-      console.log('Game Over!', this.state)
+      state.game = STATE.DRAW;
     } else {
-      this.player = this.player === PLAYER.X ? PLAYER.O : PLAYER.X;
+      state.player = player === PLAYER.X ? PLAYER.O : PLAYER.X;
     }
+
   }
 }
 
@@ -136,89 +156,86 @@ TicTacToe.prototype.isBoardFull = function(board) {
   return isFull;
 }
 
-TicTacToe.prototype.hasPlayerWon = function(board, player) {
-  const boardSize = board.length;
+// Checks if a player won on a board after a move
+TicTacToe.prototype.hasPlayerWon = function(board, player, x = 0, y = 0) {
+  // Check straights
+  let winningRow = true;
+  let winningCol = true;
 
-  let won = false;
-
-  // Check rows
-  for (let i = 0; i < boardSize; i++) {
-    let rowWinning = true;
-    for (let j = 0; j < boardSize; j++) {
-      if (board[i][j] !== player) {
-        rowWinning = false;
-      }
+  for (let i = 0; i < board.length; i++) {
+    // Check X row
+    if (board[x][i] !== player) {
+      winningRow = false;
     }
-    won = won || rowWinning;
-  }
 
-  // Check cols
-  for (let i = 0; i < boardSize; i++) {
-    let colWinning = true;
-    for (let j = 0; j < boardSize; j++) {
-      if (board[j][i] !== player) {
-        colWinning = false;
-      }
+    // Check Y column
+    if (board[i][y] !== player) {
+      winningCol = false;
     }
-    won = won || colWinning;
   }
 
   // Check diagonals
-  let leftDiagonalWinning = true;
-  let rightDiagonalWinning = true;
-  for (let i = 0; i < boardSize; i++) {
-    // Check left diagonal
-    if (board[i][i] !== player) {
-      leftDiagonalWinning = false;
-    }
-    // Check right diagonal
-    if (board[i][boardSize - i - 1] !== player) {
-      rightDiagonalWinning = false;
+  let winningLeftDiagonal = false;
+  let winningRightDiagonal = false;
+
+  if (x === y) {
+    winningLeftDiagonal = true;
+    winningRightDiagonal = true;
+
+    for (let i = 0; i < board.length; i++) {
+      // Check left diagonal
+      if (board[i][i] !== player) {
+        winningLeftDiagonal = false;
+      }
+
+      // Check right diagonal
+      if (board[i][board.length - i - 1] !== player) {
+        winningRightDiagonal = false;
+      }
     }
   }
-  won = won || leftDiagonalWinning || rightDiagonalWinning;
 
-  return won;
+  return winningRow || winningCol || winningLeftDiagonal || winningRightDiagonal;
 }
 
 // Init game
-const game = new TicTacToe(4, 'board');
+const game = new TicTacToe(4);
 
 // Unit test
-// let board;
+let board;
 
-// board = [
-//   [0, 0],
-//   [1, -1]
-// ];
-// console.log('no winner')
-// console.log(game.isBoardFull(board) === false);
-// console.log(game.hasPlayerWon(board, 1) === false);
-// console.log(game.hasPlayerWon(board, -1) === false);
+board = [
+  [0, 0],
+  [1, -1]
+];
+console.log('no winner')
+console.log(game.isBoardFull(board) === false);
+console.log(game.hasPlayerWon(board, 1, 0, 1) === false);
+console.log(game.hasPlayerWon(board, -1, 1, 1) === false);
 
-// board = [
-//   [-1, 1],
-//   [1, -1]
-// ];
-// console.log('check diagonals')
-// console.log(game.isBoardFull(board) === true);
-// console.log(game.hasPlayerWon(board, 1) === true);
-// console.log(game.hasPlayerWon(board, -1) === true);
+board = [
+  [-1, 1],
+  [1, -1]
+];
+console.log('check diagonals')
+console.log(game.isBoardFull(board) === true);
+console.log(game.hasPlayerWon(board, 1, 1, 1) === true);
+console.log(game.hasPlayerWon(board, -1, 1, 1) === true);
 
-// board = [
-//   [1, -1],
-//   [1, -1]
-// ];
-// console.log('check cols')
-// console.log(game.isBoardFull(board) === true);
-// console.log(game.hasPlayerWon(board, 1) === true);
-// console.log(game.hasPlayerWon(board, -1) === true);
+board = [
+  [1, -1],
+  [1, -1]
+];
+console.log('check cols')
+console.log(game.isBoardFull(board) === true);
+console.log(game.hasPlayerWon(board, 1, 0, 0) === true);
+console.log(game.hasPlayerWon(board, -1, 1, 1) === true);
 
-// board = [
-//   [-1, -1],
-//   [1, 1]
-// ];
-// console.log('no rows')
-// console.log(game.isBoardFull(board) === true);
-// console.log(game.hasPlayerWon(board, 1) === true);
-// console.log(game.hasPlayerWon(board, -1) === true);
+board = [
+  [-1, -1],
+  [1, 1]
+];
+console.log('no rows')
+console.log(game.isBoardFull(board) === true);
+console.log(game.hasPlayerWon(board, 1, 1, 0) === true);
+console.log(game.hasPlayerWon(board, -1, 0, 0) === true);
