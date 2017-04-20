@@ -66,7 +66,7 @@ TicTacToe.prototype.render = function(id, board) {
       _cell.setAttribute('data-y', j);
       _cell.className = 'cell';
 
-      let text = '';
+      let text = ' ';
       if (board[i][j] === -1) {
         text = 'X';
       } else if (board[i][j] === 1) {
@@ -182,7 +182,7 @@ TicTacToe.prototype.hasPlayerWon = function(board, player) {
 }
 
 // Init game
-const game = new TicTacToe(3, 'board');
+const game = new TicTacToe(4, 'board');
 
 // Unit test
 // let board;

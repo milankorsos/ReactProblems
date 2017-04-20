@@ -8,30 +8,25 @@ body {
   box-sizing: border-box;;
 }
 
-#root {
-  width: 300px;
-  margin: auto;
+#tic-tac-toe {
+  margin: 100px;
 }
 
-#root h1 {
-  text-align: center;
+#board {
+  clear: left;
 }
-
-#root #board {
-  border: 1px solid gray;
-  text-align: center;
-}
-
 
 #board .row {
- display: flex;
+  float: left;
 }
 
 #board .cell {
-  width: 100px;
-  height: 100px;
   border: 1px solid gray;
   cursor: pointer;
+  display: block;
   font-size: 50px;
+  height: 100px;
   padding: 20px;
+  text-align: center;
+  width: 100px;
 }
