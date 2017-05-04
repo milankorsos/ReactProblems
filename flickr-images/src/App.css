@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+   font-weight: 300;
+}
+
+#header {
+  margin: 5px;
+}
+
+#results {
+  clear: both;
+}
+
+.pic {
+  position: relative;
+  float: left;
+  margin: 5px;
+}
+
+span {
+  position: absolute;
+  top: 125px;
+  left: 0px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12px;
+  width: 150px;
+  height: 25px;
+  padding: 5px;
+  background: rgba(0,0,0,0.4);
+  color: white;
+}
