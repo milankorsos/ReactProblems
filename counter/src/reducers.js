@@ -20,7 +20,7 @@ function counter(state = 0, action) {
 function images(state = [], action) {
   switch (action.type) {
     case FETCH_IMAGES_SUCCESS:
-      return action.images;
+      return action.payload;
 
     case CLEAR_IMAGES:
       return [];

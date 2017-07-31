@@ -5,44 +5,17 @@ import { FETCH_IMAGES_REQUEST } from './actionTypes';
 import { FETCH_IMAGES_SUCCESS } from './actionTypes';
 import { FETCH_IMAGES_FAILURE } from './actionTypes';
 
-export function increaseCounter() {
-  return {
-    type: INCREASE_COUNTER
-  }
-}
+import { createAction } from 'redux-actions';
 
-export function decreaseCounter() {
-  return {
-    type: DECREASE_COUNTER
-  }
-}
+export const increaseCounter = createAction(INCREASE_COUNTER);
+export const decreaseCounter = createAction(DECREASE_COUNTER);
 
-export function clearImages() {
-  return {
-    type: CLEAR_IMAGES
-  }
-}
+export const clearImages = createAction(CLEAR_IMAGES);
 
-function fetchImagesRequest(query) {
-  return {
-    type: FETCH_IMAGES_REQUEST,
-    query
-  }
-}
+const fetchImagesRequest = createAction(FETCH_IMAGES_REQUEST);
+const fetchImagesSuccess = createAction(FETCH_IMAGES_SUCCESS);
+const fetchImagesFailure = createAction(FETCH_IMAGES_FAILURE);
 
-function fetchImagesSuccess(images) {
-  return {
-    type: FETCH_IMAGES_SUCCESS,
-    images
-  }
-}
-
-function fetchImagesFailure(error) {
-  return {
-    type: FETCH_IMAGES_FAILURE,
-    error
-  }
-}
 
 export function fetchImages(query) {
   return (dispatch) => {
